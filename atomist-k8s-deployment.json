@@ -1,0 +1,96 @@
+{
+  "apiVersion": "extensions/v1beta1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "baldung",
+    "labels": {
+      "app": "baldung",
+      "owner": "empire-of-software",
+      "teamId": "A4GEO7GK4",
+      "creator": "atomist.k8-automation"
+    }
+  },
+  "spec": {
+    "replicas": 1,
+    "revisionHistoryLimit": 3,
+    "selector": {
+      "matchLabels": {
+        "app": "baldung",
+        "owner": "empire-of-software",
+        "teamId": "A4GEO7GK4"
+      }
+    },
+    "template": {
+      "metadata": {
+        "name": "baldung",
+        "labels": {
+          "app": "baldung",
+          "owner": "empire-of-software",
+          "teamId": "A4GEO7GK4",
+          "creator": "atomist.k8-automation"
+        },
+        "annotations": {
+          "atomist.com/k8vent": "{\"environment\":\"testing\",\"webhooks\":[\"https://webhook.atomist.com/atomist/kube/teams/A4GEO7GK4\"]}",
+          "atomist.com/repo-image": "[{\"container\":\"baldung\",\"repo\":{\"owner\":\"empire-of-software\",\"name\":\"baldung\"},\"image\":\"image_placeholder\"}]"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "baldung",
+            "image": "image_placeholder",
+            "imagePullPolicy": "IfNotPresent",
+            "resources": {
+              "limits": {
+                "cpu": "300m",
+                "memory": "384Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "320Mi"
+              }
+            },
+            "readinessProbe": {
+              "httpGet": {
+                "path": "/info",
+                "port": "http",
+                "scheme": "HTTP"
+              },
+              "initialDelaySeconds": 60,
+              "timeoutSeconds": 3,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "failureThreshold": 3
+            },
+            "livenessProbe": {
+              "httpGet": {
+                "path": "/health",
+                "port": "http",
+                "scheme": "HTTP"
+              },
+              "initialDelaySeconds": 60,
+              "timeoutSeconds": 3,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "failureThreshold": 3
+            },
+            "ports": [
+              {
+                "name": "http",
+                "containerPort": 8080,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "strategy": {
+      "type": "RollingUpdate",
+      "rollingUpdate": {
+        "maxUnavailable": 0,
+        "maxSurge": 1
+      }
+    }
+  }
+}
